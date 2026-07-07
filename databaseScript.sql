@@ -56,13 +56,6 @@ CREATE TABLE Componente (
     FOREIGN KEY (id_resposta) REFERENCES Resposta(id)
 );
 
-CREATE TABLE Atalho (
-    id varchar(36) PRIMARY KEY,
-    id_pedido varchar(36),
-    titulo varchar(255) NOT NULL,
-    criacao DATETIME,
-    FOREIGN KEY (id_pedido) REFERENCES Pedido(id)
-);
 
 INSERT INTO AppSuportado (id, nome, descricao, referencia, situacao, pacote) VALUES
 (1,'WhatsApp', 'Aplicativo de mensagens instantâneas', 'mensagem', 'Utilizado para se comunicar', 'com.whatsapp'),
