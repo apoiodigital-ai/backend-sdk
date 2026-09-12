@@ -49,7 +49,7 @@ EXEMPLO 2 (Tela de Carrinho Pronta - Fluxo Livre):
 {
   "interromper": false,
   "tipo_pendencia": "nenhuma",
-  "descricao_da_duvida": "O carrinho contém o item correto e o botão 'Continuar' é a ação lógica esperada."
+  "descricao_duvida": "O carrinho contém o item correto e o botão 'Continuar' é a ação lógica esperada."
 }
 
 EXEMPLO 3 (Campo de Endereço - Faltando Dados):

@@ -43,7 +43,7 @@ public class RespostaNecessidadeService {
     }
 
     public RespostaNecessidadeResponseDTO validar(RespostaNecessidadeRequestDTO request, Cliente cliente) {
-        Usuario usuario = usuarioService.buscarPorIdEValidarTenant(request.userId(), cliente);
+        Usuario usuario = usuarioService.resolverOuCriar(request.userId(), cliente);
 
         Pedido pedido = pedidoRepository.findByIdAndUsuarioId(request.idPedido(), usuario.getId())
                 .orElseThrow(PedidoDoesNotExistException::new);

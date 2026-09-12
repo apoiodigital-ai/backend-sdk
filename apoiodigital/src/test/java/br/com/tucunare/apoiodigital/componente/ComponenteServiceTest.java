@@ -1,6 +1,6 @@
 package br.com.tucunare.apoiodigital.componente;
 
-import br.com.tucunare.apoiodigital.agent.AndroidComponentDTO;
+import br.com.tucunare.apoiodigital.agent.CapturedElementDTO;
 import br.com.tucunare.apoiodigital.cliente.data.Cliente;
 import br.com.tucunare.apoiodigital.componente.data.Componente;
 import br.com.tucunare.apoiodigital.componente.exception.ComponenteNaoEncontradoException;
@@ -51,7 +51,7 @@ class ComponenteServiceTest {
         cliente = new Cliente("Banco Teste", "access-key-teste", "banco");
         cliente.setId(UUID.randomUUID());
 
-        Usuario usuario = new Usuario("usuario-teste", cliente);
+        Usuario usuario = new Usuario("usr_anon_teste", "usuario-teste", cliente);
         usuario.setId(UUID.randomUUID());
 
         Pedido pedido = new Pedido(usuario, "prompt de teste");
@@ -61,16 +61,28 @@ class ComponenteServiceTest {
         resposta.setId(UUID.randomUUID());
     }
 
+    /** Builds a wire-shaped element; coordinates default to an arbitrary frame. */
+    private static CapturedElementDTO elemento(String viewId, String className, String text) {
+        return elemento(viewId, className, text, 0.0, 0.0, 100.0, 40.0);
+    }
+
+    private static CapturedElementDTO elemento(
+            String viewId, String className, String text,
+            double x, double y, double width, double height
+    ) {
+        return new CapturedElementDTO(viewId, className, text, false, true, x, y, width, height);
+    }
+
     @Test
     @DisplayName("gerarAssinatura is deterministic regardless of element order")
     void gerarAssinaturaIgnoraOrdem() {
-        List<AndroidComponentDTO> ordemA = List.of(
-                new AndroidComponentDTO(1, "Button", "Buscar"),
-                new AndroidComponentDTO(2, "TextView", "Bem-vindo")
+        List<CapturedElementDTO> ordemA = List.of(
+                elemento("btn_buscar", "Button", "Buscar"),
+                elemento("txt_boasvindas", "TextView", "Bem-vindo")
         );
-        List<AndroidComponentDTO> ordemB = List.of(
-                new AndroidComponentDTO(2, "TextView", "Bem-vindo"),
-                new AndroidComponentDTO(1, "Button", "Buscar")
+        List<CapturedElementDTO> ordemB = List.of(
+                elemento("txt_boasvindas", "TextView", "Bem-vindo"),
+                elemento("btn_buscar", "Button", "Buscar")
         );
 
         assertEquals(componenteService.gerarAssinatura(ordemA), componenteService.gerarAssinatura(ordemB));
@@ -79,16 +91,25 @@ class ComponenteServiceTest {
     @Test
     @DisplayName("gerarAssinatura changes when an element's content changes")
     void gerarAssinaturaMudaComConteudoDiferente() {
-        List<AndroidComponentDTO> original = List.of(new AndroidComponentDTO(1, "Button", "Buscar"));
-        List<AndroidComponentDTO> alterado = List.of(new AndroidComponentDTO(1, "Button", "Cancelar"));
+        List<CapturedElementDTO> original = List.of(elemento("btn_acao", "Button", "Buscar"));
+        List<CapturedElementDTO> alterado = List.of(elemento("btn_acao", "Button", "Cancelar"));
 
         assertNotEquals(componenteService.gerarAssinatura(original), componenteService.gerarAssinatura(alterado));
     }
 
     @Test
+    @DisplayName("gerarAssinatura ignores coordinates/size — same screen on different devices hashes equal")
+    void gerarAssinaturaIgnoraCoordenadas() {
+        List<CapturedElementDTO> telaPequena = List.of(elemento("btn_acao", "Button", "Buscar", 10, 20, 90, 30));
+        List<CapturedElementDTO> telaGrande = List.of(elemento("btn_acao", "Button", "Buscar", 40, 80, 300, 90));
+
+        assertEquals(componenteService.gerarAssinatura(telaPequena), componenteService.gerarAssinatura(telaGrande));
+    }
+
+    @Test
     @DisplayName("comparar returns true when the screen hash matches the stored assinatura")
     void compararTelaIgual() {
-        List<AndroidComponentDTO> elementos = List.of(new AndroidComponentDTO(1, "Button", "Buscar"));
+        List<CapturedElementDTO> elementos = List.of(elemento("btn_acao", "Button", "Buscar"));
         String assinatura = componenteService.gerarAssinatura(elementos);
         Componente componente = new Componente(assinatura, resposta);
 
@@ -103,8 +124,8 @@ class ComponenteServiceTest {
     @Test
     @DisplayName("comparar returns false when the screen changed since the assinatura was stored")
     void compararTelaDiferente() {
-        List<AndroidComponentDTO> elementosOriginais = List.of(new AndroidComponentDTO(1, "Button", "Buscar"));
-        List<AndroidComponentDTO> elementosNovos = List.of(new AndroidComponentDTO(1, "Button", "Cancelar"));
+        List<CapturedElementDTO> elementosOriginais = List.of(elemento("btn_acao", "Button", "Buscar"));
+        List<CapturedElementDTO> elementosNovos = List.of(elemento("btn_acao", "Button", "Cancelar"));
         String assinatura = componenteService.gerarAssinatura(elementosOriginais);
         Componente componente = new Componente(assinatura, resposta);
 

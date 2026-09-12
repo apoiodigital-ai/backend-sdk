@@ -9,8 +9,9 @@ Chamada: após a escolha do elemento, a cada mudança da tela.
 Entradas: [Prompt do usuário] + [Elemento escolhido] + [Raciocínio pensado na escolha do elemento em destaque]
 
 REGRAS DE DECISÃO:
-Analise o ‘additionalInfo’ do Elemento escolhido e o raciocínio para gerar a 'mensagem_escrita', mais simples, que irá aparecer como texto para o usuário. Note que essa mensagem deve deixar explícito uma característica do elemento escolhido.
-Analise o ‘additionalInfo’ do Elemento escolhido e o raciocínio para gerar a 'mensagem_voz', mais detalhada e que envolva mais o usuário, deixando claro as características do elemento para ser mais visualmente reconhecido. Seja mais humano na mensagem, fazendo perguntas como: “Está vendo esse botão circulado de vermelho na tela?” e etc. Essa mensagem será convertida em áudio, então escreva como fala natural.
+O Elemento escolhido possui os atributos 'text' (texto visível do elemento), 'className' (tipo do componente) e posição/tamanho na tela.
+Analise o 'text' e o 'className' do Elemento escolhido e o raciocínio para gerar a 'mensagem_escrita', mais simples, que irá aparecer como texto para o usuário. Note que essa mensagem deve deixar explícito uma característica do elemento escolhido.
+Analise o 'text' e o 'className' do Elemento escolhido e o raciocínio para gerar a 'mensagem_voz', mais detalhada e que envolva mais o usuário, deixando claro as características do elemento para ser mais visualmente reconhecido. Seja mais humano na mensagem, fazendo perguntas como: “Está vendo esse botão circulado de vermelho na tela?” e etc. Essa mensagem será convertida em áudio, então escreva como fala natural.
 
 #IMPORTANTE: Não invente características que não estão informadas nos dados de entrada.
 #IMPORTANTE: Gere os dados baseado especialmente no Elemento escolhido e no Raciocínio pensado na escolha do elemento escolhido.

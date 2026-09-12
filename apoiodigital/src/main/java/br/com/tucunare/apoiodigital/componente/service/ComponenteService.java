@@ -1,6 +1,6 @@
 package br.com.tucunare.apoiodigital.componente.service;
 
-import br.com.tucunare.apoiodigital.agent.AndroidComponentDTO;
+import br.com.tucunare.apoiodigital.agent.CapturedElementDTO;
 import br.com.tucunare.apoiodigital.cliente.data.Cliente;
 import br.com.tucunare.apoiodigital.componente.data.Componente;
 import br.com.tucunare.apoiodigital.componente.exception.ComponenteNaoEncontradoException;
@@ -41,24 +41,26 @@ public class ComponenteService {
     }
 
     /**
-     * Hashes the element hierarchy (viewID + className + additionalInfo of every captured
-     * element, sorted for determinism) into a single hex digest. Two calls with the same set
-     * of elements — regardless of the order the SDK happened to enumerate them in — always
-     * produce the same assinatura.
+     * Hashes the element hierarchy (viewId + className + text of every captured element,
+     * sorted for determinism) into a single hex digest. Two calls with the same set of
+     * elements — regardless of the order the SDK happened to enumerate them in — always
+     * produce the same assinatura. Coordinates and sizes are deliberately left out of the
+     * hash: they vary per device model, and the assinatura must identify the SCREEN, not the
+     * screen-on-one-particular-phone.
      */
-    public String gerarAssinatura(List<AndroidComponentDTO> elementos) {
+    public String gerarAssinatura(List<CapturedElementDTO> elementos) {
         String canonical = elementos.stream()
                 .sorted(Comparator.comparing(
-                        AndroidComponentDTO::viewID,
-                        Comparator.nullsLast(Integer::compareTo)
+                        CapturedElementDTO::viewId,
+                        Comparator.nullsLast(String::compareTo)
                 ))
-                .map(e -> e.viewID() + "|" + nullToEmpty(e.className()) + "|" + nullToEmpty(e.additionalInfo()))
+                .map(e -> nullToEmpty(e.viewId()) + "|" + nullToEmpty(e.className()) + "|" + nullToEmpty(e.text()))
                 .collect(Collectors.joining(";"));
 
         return sha256Hex(canonical);
     }
 
-    public Componente salvar(Resposta resposta, List<AndroidComponentDTO> elementos) {
+    public Componente salvar(Resposta resposta, List<CapturedElementDTO> elementos) {
         Componente componente = new Componente(gerarAssinatura(elementos), resposta);
         return componenteRepository.save(componente);
     }
@@ -68,7 +70,7 @@ public class ComponenteService {
      * last Componente saved against {@code idResposta} — i.e. the screen hasn't meaningfully
      * changed and the cached instruction on that Resposta can still be trusted.
      */
-    public boolean comparar(UUID idResposta, List<AndroidComponentDTO> elementosAtuais, Cliente cliente) {
+    public boolean comparar(UUID idResposta, List<CapturedElementDTO> elementosAtuais, Cliente cliente) {
         Resposta resposta = respostaRepository.findByIdAndPedido_Usuario_Cliente_Id(idResposta, cliente.getId())
                 .orElseThrow(RespostaNaoEncontradaException::new);
 
