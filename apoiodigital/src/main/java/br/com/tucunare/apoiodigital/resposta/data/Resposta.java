@@ -12,9 +12,16 @@ import org.hibernate.type.SqlTypes;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+/**
+ * The final instruction produced for a Pedido. {@link #raciocinio} is the internal
+ * reasoning/audit trail behind that instruction (the ElementSelector agent's own explanation of
+ * why it picked a given element) — it was entirely missing before this refactor even though it
+ * is what backs the product's "auditoria e rastreabilidade total" (full audit trail) claim.
+ * {@link #mensagem} remains the user-facing text, unchanged in meaning from before.
+ */
 @Entity
 @Data
-@Table(name = "Resposta")
+@Table(name = "resposta")
 @NoArgsConstructor
 public class Resposta {
 
@@ -24,26 +31,25 @@ public class Resposta {
     @JdbcTypeCode(SqlTypes.VARCHAR)
     private UUID id;
 
-    @ManyToOne
-    @JoinColumn(name = "id_pedido")
-    @JdbcTypeCode(SqlTypes.VARCHAR)
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "id_pedido", nullable = false)
     @JsonIgnore
     private Pedido pedido;
 
-    @Column(name = "mensagem", columnDefinition="TEXT")
+    @Column(name = "mensagem", columnDefinition = "TEXT")
     private String mensagem;
 
-    @Column(name = "raciocinio", columnDefinition="TEXT")
+    @Column(name = "raciocinio", columnDefinition = "TEXT")
     private String raciocinio;
 
-    @Column(name="timestamp")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy hh:mm:ss")
+    @Column(name = "timestamp")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm:ss")
     private LocalDateTime timestamp;
 
     public Resposta(Pedido pedido, String mensagem, String raciocinio) {
         this.pedido = pedido;
         this.mensagem = mensagem;
         this.raciocinio = raciocinio;
-        timestamp = LocalDateTime.now();
+        this.timestamp = LocalDateTime.now();
     }
 }

@@ -7,7 +7,7 @@ IMPORTANTE: Você NÃO escreve a pergunta para o usuário. Sua única responsabi
 
 DINÂMICA DE EXECUÇÃO:
 Chamada: A cada alteração de estado da tela.
-Entradas: [Prompt do usuario] + [Contexto atual da tela do usuário] + [ELEMENTOS DISPONÍVEIS] + [Histórico de especificações fornecidadas pelo usuário].
+Entradas: [Prompt do usuário] + [Lista de elementos disponíveis na tela atual]. Não há mais um "contexto" separado enviado pelo front-end: os próprios elementos representam o estado atual da tela.
 
 ---
 
@@ -18,7 +18,6 @@ REGRAS DE DECISÃO:
    - IGNORAR RUÍDO VISUAL: O fato de haver múltiplas opções na tela (como dezenas de categorias, banners promocionais ou atalhos variados) NÃO gera ambiguidade, desde que a ação principal alinhada ao pedido do usuário possa ser executada.
    - Quando as opções na tela são apenas exploratórias (ex: tela inicial do app) e não bloqueiam o preenchimento ou clique necessário para o que o usuário pediu.
    - Quando a maioria dos dados necessários para a ação atual já foram coletados.
-   - Quando a especificação já foi respondida pelo usuário no histórico de especificações
 
 2. NECESSITA_INTERRUPCAO: true (O fluxo para e chama o Agente de Diálogo)
    - AMBIGUIDADE DE ESCOLHA DIRETA: A tela apresenta múltiplos itens *relacionados ao objetivo específico do usuário* que exigem uma escolha subjetiva (ex: o usuário quer hambúrguer e a tela mostra 10 restaurantes diferentes de hambúrguer).
