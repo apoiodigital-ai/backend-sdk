@@ -51,22 +51,24 @@ export DB_PASSWORD=<senha mysql>
 
 O schema é criado/versionado pelo Flyway na subida (`ddl-auto=validate` — o Hibernate nunca gera DDL). Nenhuma credencial tem default hardcoded.
 
-## Gaps conhecidos (verificação crítica de 12/09/2026)
+## Contrato com o frontend-sdk (alinhado em 12/09/2026)
 
-Bloqueadores de integração com o `frontend-sdk` — **os dois lados ainda não falam o mesmo wire format**:
+Os três bloqueadores de integração da verificação crítica foram **corrigidos**:
 
-1. **`elementos` incompatível**: o SDK envia `{viewId: string, className, text, isSecure, isInteractive, x, y, width, height}`; este backend espera `AndroidComponentDTO {viewID: Integer, className, additionalInfo}`. Nome (`viewId` vs `viewID`), tipo (string vs Integer) e campos divergem — hoje o pipeline receberia `viewID=null` e perderia todo o texto capturado. A direção do doc V2 (payload de exemplo com `"viewID": "btn_teleconsulta_entrar_sala"`) é evoluir o backend para o shape rico com id string.
-2. **Identidade do usuário**: o doc e o SDK tratam `userId` como hash anônimo fornecido pelo parceiro; este backend exige um UUID emitido por `POST /usuario/registrar` — que o SDK nunca chama. Definir um contrato único (recomendação: aceitar o id externo do parceiro como chave, escopado ao tenant).
-3. **Loop de follow-up sem opções**: `/validar/resposta-necessidade` devolve `pergunta.opcoes = []` (resposta livre), mas o `QuestionSheet` do SDK só renderiza botões — o overlay travaria. Ou o backend gera opções sempre, ou o SDK ganha entrada de texto/voz.
+1. **`elementos`**: desserializado em `CapturedElementDTO`, espelho exato do `CapturedElement` do SDK (`viewId: string`, `className`, `text`, `isSecure`, `isInteractive`, `x/y/width/height`). O ElementSelector escolhe e devolve o `viewId` string, ecoado de volta como `viewID` na resposta de `/achar-resposta` — o SDK o casa com o próprio índice para posicionar o Spotlight. A `assinatura` do Componente é hash de `viewId|className|text` (coordenadas ficam de fora, para a mesma tela ter o mesmo hash em qualquer aparelho).
+2. **Identidade do usuário**: `userId` é o hash anônimo emitido pelo **parceiro** (string, doc V2 §2.4), armazenado em `usuario.external_id` (único por tenant — migração `V2__usuario_external_id.sql`) e **auto-provisionado na primeira chamada** de qualquer endpoint `/resposta/*`. `POST /usuario/registrar` virou pré-registro opcional e idempotente.
+3. **Loop de follow-up**: continua devolvendo `pergunta.opcoes = []` quando a resposta é livre — o `QuestionSheet` do SDK agora renderiza campo de texto nesse caso (corrigido no frontend-sdk).
 
-Dívidas frente ao plano de custos (doc §7.4 e revisão de custos):
+> **Atenção**: as correções do backend ainda **não foram compiladas/testadas** — não há JDK 17 nesta máquina de desenvolvimento. Rode `./mvnw test` (JDK 17+) antes de fazer deploy.
 
-4. **Cache de assinatura não plugado**: `Componente.assinatura` e `/componentes/comparar` existem, mas `achar-resposta` sempre roda os dois agentes e o SDK nunca consulta o cache. A promessa de >70% de hit (tela repetida → 0 chamadas de IA) exige: lookup por assinatura *antes* dos agentes + reuso cross-usuário por tela (hoje a assinatura fica presa à `Resposta`).
-5. **Personalizacao inerte**: `regra_personalizada` é persistida mas nenhum agente a injeta no prompt.
-6. **Sem cascata de modelos**: um único modelo para os 5 agentes (mitigado por já ser um modelo barato); sem log de tokens reais por agente.
-7. **Sem poda da árvore de elementos** antes dos prompts (efeito multiplicativo no custo das chamadas).
+## Dívidas conhecidas (plano de custos, doc §7.4)
 
-Outros: `access_key` em texto plano no banco (avaliar hash); código compila mas não há build/CI verificado neste ambiente; testes cobrem apenas `ComponenteService`.
+1. **Cache de assinatura não plugado**: `Componente.assinatura` e `/componentes/comparar` existem, mas `achar-resposta` sempre roda os dois agentes e o SDK nunca consulta o cache. A promessa de >70% de hit (tela repetida → 0 chamadas de IA) exige: lookup por assinatura *antes* dos agentes + reuso cross-usuário por tela (hoje a assinatura fica presa à `Resposta`).
+2. **Personalizacao inerte**: `regra_personalizada` é persistida mas nenhum agente a injeta no prompt.
+3. **Sem cascata de modelos**: um único modelo para os 5 agentes (mitigado por já ser um modelo barato); sem log de tokens reais por agente.
+4. **Sem poda da árvore de elementos** antes dos prompts (efeito multiplicativo no custo das chamadas).
+
+Outros: `access_key` em texto plano no banco (avaliar hash); testes cobrem apenas `ComponenteService`.
 
 ## Estrutura
 

@@ -9,9 +9,10 @@ import java.util.UUID;
 public interface UsuarioRepository extends JpaRepository<Usuario, UUID> {
 
     /**
-     * The only safe way to look up an end user by client-supplied id: it is scoped to the
-     * authenticated tenant, so a UUID belonging to another partner's user never resolves here
-     * (this is the fix for the IDOR pattern where any UUID would return that user's data).
+     * The only safe way to resolve a client-supplied {@code userId}: the lookup is scoped to
+     * the authenticated tenant, so an external id belonging to another partner's user never
+     * resolves here (same anti-IDOR posture as the old findByIdAndClienteId, applied to the
+     * partner-minted identifier the SDK actually sends).
      */
-    Optional<Usuario> findByIdAndClienteId(UUID id, UUID clienteId);
+    Optional<Usuario> findByExternalIdAndClienteId(String externalId, UUID clienteId);
 }

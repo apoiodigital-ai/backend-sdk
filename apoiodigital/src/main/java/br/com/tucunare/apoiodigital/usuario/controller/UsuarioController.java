@@ -22,15 +22,17 @@ public class UsuarioController {
     }
 
     /**
-     * Called by CaneSDK.registerUser() on the partner's side. The partner has already
-     * anonymized whatever identifies the end user on their side; we just mint an id for them,
-     * scoped to the authenticated Cliente (resolved from x-api-key), and hand it back so the
-     * SDK can use it as userId in every subsequent call.
+     * Optional pre-registration of a partner-minted anonymized userId (idempotent). The SDK
+     * itself never calls this — its registerUser() is purely local, and the first
+     * {@code /resposta/*} request auto-provisions the Usuario for the authenticated tenant
+     * (see {@code UsuarioService#resolverOuCriar}). This endpoint exists for partners who want
+     * to attach an alias ({@code nome}) or provision users ahead of time from their own
+     * backend.
      */
     @PostMapping("/registrar")
     public ResponseEntity<Usuario> registrar(@RequestBody RegistrarUsuarioRequestDTO request) {
         Cliente cliente = tenantContext.getClienteAtual();
-        Usuario usuario = usuarioService.registrar(request.nome(), cliente);
+        Usuario usuario = usuarioService.registrar(request.userId(), request.nome(), cliente);
         return ResponseEntity.status(HttpStatus.CREATED).body(usuario);
     }
 }

@@ -45,7 +45,7 @@ public class NecessidadeInformacoesService {
     }
 
     public NecessidadeInformacoesResponseDTO validar(NecessidadeInformacoesRequestDTO request, Cliente cliente) {
-        Usuario usuario = usuarioService.buscarPorIdEValidarTenant(request.userId(), cliente);
+        Usuario usuario = usuarioService.resolverOuCriar(request.userId(), cliente);
 
         Pedido pedido = pedidoRepository.save(new Pedido(usuario, request.prompt()));
 

@@ -11,12 +11,14 @@ import org.hibernate.type.SqlTypes;
 import java.util.UUID;
 
 /**
- * An end user of a partner ({@link Cliente}) app. Under the SDK model the partner app supplies
- * an already-anonymized identity via {@code CaneSDK.registerUser()} (see
- * {@code UsuarioController#registrar}) — this backend never stores a phone number or a
- * password for end users, only an opaque id scoped to the partner that registered it. (The old
- * standalone-app fields {@code telefone}/{@code senha} were removed along with the phone+password
- * login flow they supported; see the refactor report for why.)
+ * An end user of a partner ({@link Cliente}) app. The partner app supplies an
+ * already-anonymized identifier (an opaque hash minted on THEIR side — doc V2 §2.4) which the
+ * SDK forwards verbatim as {@code userId}; it is stored here as {@link #externalId}, unique
+ * per tenant, and the row is auto-provisioned on first use (see
+ * {@code UsuarioService#resolverOuCriar}). The internal UUID {@link #id} stays as the FK
+ * target for Pedido. This backend never stores a phone number or a password for end users.
+ * (The old standalone-app fields {@code telefone}/{@code senha} were removed along with the
+ * phone+password login flow they supported; see the refactor report for why.)
  */
 @Entity
 @Data
@@ -30,6 +32,10 @@ public class Usuario {
     @JdbcTypeCode(SqlTypes.VARCHAR)
     private UUID id;
 
+    /** The partner-minted anonymized identifier ({@code userId} on the wire), unique per tenant. */
+    @Column(name = "external_id", nullable = false)
+    private String externalId;
+
     @Column(name = "nome")
     private String nome;
 
@@ -38,7 +44,8 @@ public class Usuario {
     @JsonIgnore
     private Cliente cliente;
 
-    public Usuario(String nome, Cliente cliente) {
+    public Usuario(String externalId, String nome, Cliente cliente) {
+        this.externalId = externalId;
         this.nome = nome;
         this.cliente = cliente;
     }

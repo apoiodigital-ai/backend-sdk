@@ -1,6 +1,6 @@
 package br.com.tucunare.apoiodigital.resposta.service;
 
-import br.com.tucunare.apoiodigital.agent.AndroidComponentDTO;
+import br.com.tucunare.apoiodigital.agent.CapturedElementDTO;
 import br.com.tucunare.apoiodigital.cliente.data.Cliente;
 import br.com.tucunare.apoiodigital.componente.service.ComponenteService;
 import br.com.tucunare.apoiodigital.pedido.data.Pedido;
@@ -59,7 +59,7 @@ public class AcharRespostaService {
     }
 
     public AcharRespostaResponseDTO acharResposta(AcharRespostaRequestDTO request, Cliente cliente) {
-        Usuario usuario = usuarioService.buscarPorIdEValidarTenant(request.userId(), cliente);
+        Usuario usuario = usuarioService.resolverOuCriar(request.userId(), cliente);
 
         Pedido pedido = pedidoRepository.save(new Pedido(usuario, request.prompt()));
 
@@ -67,11 +67,11 @@ public class AcharRespostaService {
                 new ElementSelectorRequestDTO(request.prompt(), request.elementos())
         );
 
-        AndroidComponentDTO elementoEscolhido = request.elementos().stream()
-                .filter(e -> selecao.viewID().equals(e.viewID()))
+        CapturedElementDTO elementoEscolhido = request.elementos().stream()
+                .filter(e -> selecao.viewId().equals(e.viewId()))
                 .findFirst()
                 .orElseThrow(() -> new IllegalStateException(
-                        "ElementSelector retornou um viewID que não está na lista de elementos enviada"
+                        "ElementSelector retornou um viewId que não está na lista de elementos enviada"
                 ));
 
         ScreenContextDefinerResponseDTO textoGuia = screenContextDefinerService.executeTask(
@@ -89,7 +89,7 @@ public class AcharRespostaService {
                 .orElse(null);
 
         return new AcharRespostaResponseDTO(
-                String.valueOf(selecao.viewID()),
+                selecao.viewId(),
                 textoGuia.mensagem_escrita(),
                 mensagemVozUrl,
                 selecao.precisao()
