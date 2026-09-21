@@ -25,11 +25,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
-/**
- * Covers the real assinatura-hashing logic that replaced ComponenteService#comparar's previous
- * dead implementation (it used to ignore both of its string arguments and always return true
- * once a Resposta id was found).
- */
 class ComponenteServiceTest {
 
     @Mock
@@ -61,7 +56,6 @@ class ComponenteServiceTest {
         resposta.setId(UUID.randomUUID());
     }
 
-    /** Builds a wire-shaped element; coordinates default to an arbitrary frame. */
     private static CapturedElementDTO elemento(String viewId, String className, String text) {
         return elemento(viewId, className, text, 0.0, 0.0, 100.0, 40.0);
     }

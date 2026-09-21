@@ -25,8 +25,6 @@ public class RespostaService {
         Pedido pedido = pedidoRepository.findById(idPedido)
                 .orElseThrow(PedidoDoesNotExistException::new);
 
-        // Same 404 whether the Pedido doesn't exist or belongs to another tenant, so this
-        // can't be used to enumerate ids across partners.
         if (!pedido.getUsuario().getCliente().getId().equals(cliente.getId())) {
             throw new PedidoDoesNotExistException();
         }

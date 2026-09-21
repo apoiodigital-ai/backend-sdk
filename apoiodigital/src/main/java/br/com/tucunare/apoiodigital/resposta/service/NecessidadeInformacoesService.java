@@ -16,14 +16,6 @@ import br.com.tucunare.apoiodigital.usuario.data.Usuario;
 import br.com.tucunare.apoiodigital.usuario.service.UsuarioService;
 import org.springframework.stereotype.Service;
 
-/**
- * Backs {@code POST /resposta/validar/necessidade-informacoes}: the Gatekeeper entry point
- * (Agente 0, {@link PendingValidatorService}) decides whether the request is unambiguous enough
- * to act on directly; when it is not, the QuestionWriter (Agente 1,
- * {@link QuestionWriterService}) drafts the clarifying question. Persists the Pedido this
- * request represents so the (possible) clarification loop in
- * {@code POST /resposta/validar/resposta-necessidade} has somewhere to reload its state from.
- */
 @Service
 public class NecessidadeInformacoesService {
 

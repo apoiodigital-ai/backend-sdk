@@ -21,14 +21,6 @@ public class UsuarioController {
         this.tenantContext = tenantContext;
     }
 
-    /**
-     * Optional pre-registration of a partner-minted anonymized userId (idempotent). The SDK
-     * itself never calls this — its registerUser() is purely local, and the first
-     * {@code /resposta/*} request auto-provisions the Usuario for the authenticated tenant
-     * (see {@code UsuarioService#resolverOuCriar}). This endpoint exists for partners who want
-     * to attach an alias ({@code nome}) or provision users ahead of time from their own
-     * backend.
-     */
     @PostMapping("/registrar")
     public ResponseEntity<Usuario> registrar(@RequestBody RegistrarUsuarioRequestDTO request) {
         Cliente cliente = tenantContext.getClienteAtual();

@@ -20,19 +20,6 @@ import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/**
- * Calls the Gemini "generateContent" REST API directly with {@code responseModalities: ["AUDIO"]}
- * to synthesize speech. Spring AI's bundled google-genai starter (used everywhere else in this
- * codebase for chat) does not expose an audio/TTS model abstraction in the version pinned in
- * pom.xml, so this talks to the public Generative Language API over plain HTTP using the same
- * API key already configured for chat (spring.ai.google.genai.api-key / APIKEY env var) —
- * consistent with how the rest of the app already depends on that same external API.
- *
- * <p>The API returns raw PCM audio (16-bit signed, mono, typically 24kHz — the actual rate is
- * read back from the response's mimeType when present) with no container around it, so it is
- * wrapped in a minimal WAV header before being written to disk; without that header most audio
- * players/decoders on the SDK side would not recognize the bytes as playable audio.</p>
- */
 @Service
 public class GeminiTtsService implements TtsService {
 
@@ -144,8 +131,8 @@ public class GeminiTtsService implements TtsService {
         out.write(intToLittleEndian(36 + dataLength));
         out.write("WAVE".getBytes());
         out.write("fmt ".getBytes());
-        out.write(intToLittleEndian(16)); // subchunk1 size (PCM)
-        out.write(shortToLittleEndian((short) 1)); // audio format = PCM
+        out.write(intToLittleEndian(16));
+        out.write(shortToLittleEndian((short) 1));
         out.write(shortToLittleEndian((short) channels));
         out.write(intToLittleEndian(sampleRate));
         out.write(intToLittleEndian(byteRate));

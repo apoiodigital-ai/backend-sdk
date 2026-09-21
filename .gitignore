@@ -3,3 +3,4 @@ target/
 *.iml
 audio-storage/
 .DS_Store
+CLAUDE.md

@@ -8,11 +8,6 @@ import org.hibernate.type.SqlTypes;
 
 import java.util.UUID;
 
-/**
- * Custom AI-behavior rule scoped to a single {@link Cliente} (e.g. tone of voice, vocabulary
- * restrictions). Read by the agent pipeline and merged into the system rule sent to the model
- * so each partner can tailor how Cane speaks to their own end users.
- */
 @Entity
 @Data
 @NoArgsConstructor

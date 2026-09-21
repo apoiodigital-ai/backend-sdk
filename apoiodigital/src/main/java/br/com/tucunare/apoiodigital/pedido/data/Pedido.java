@@ -13,21 +13,6 @@ import org.hibernate.type.SqlTypes;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-/**
- * One user request/screen-step handled by the agent pipeline — the target schema's Pedido,
- * repurposed from the old (now removed) Requisicao entity. Under the old standalone-app model a
- * Requisicao also carried an AppSuportado (which of the user's installed apps to route to);
- * that concept has no equivalent under the SDK model, where the partner's own app is always
- * the single context, so it is dropped rather than carried forward.
- *
- * <p>Beyond the three columns the schema calls for (usuario, prompt, timestamp), this entity
- * also carries the small amount of state needed to run the clarification loop described by
- * POST /resposta/validar/necessidade-informacoes and POST /resposta/validar/resposta-necessidade:
- * when the Gatekeeper (Agente 0) raises a pendency, {@link #status} moves to
- * {@code AGUARDANDO_INFORMACAO} and the pendency + pending question are stashed here so the
- * second endpoint — which only receives {@code idPedido} and the user's raw answer — can
- * reload what question is being answered instead of trusting the client to resend it.</p>
- */
 @Entity
 @Data
 @NoArgsConstructor

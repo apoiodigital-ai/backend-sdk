@@ -14,12 +14,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.regex.Pattern;
 
-/**
- * Serves the audio files GeminiTtsService writes to disk. Left out of authentication in
- * SecurityConfig (a plain {@code <audio src>} can't attach an x-api-key header); the filename
- * itself is an unguessable random UUID, and only a strict filename shape is accepted here to
- * rule out path traversal.
- */
 @RestController
 @RequestMapping("/audio")
 public class AudioController {

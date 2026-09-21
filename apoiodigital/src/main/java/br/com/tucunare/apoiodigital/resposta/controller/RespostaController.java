@@ -14,12 +14,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-/**
- * The three SDK-facing agent-pipeline endpoints, plus a history lookup. Every method resolves
- * the calling tenant via {@link TenantContext} (populated by the x-api-key filter) and passes it
- * down so userId/idPedido/idResposta are validated against that tenant before anything is read
- * or written — see the individual services for where each id is actually checked.
- */
 @RestController
 @RequestMapping("/resposta")
 public class RespostaController {
@@ -44,7 +38,6 @@ public class RespostaController {
         this.tenantContext = tenantContext;
     }
 
-    /** Gatekeeper (Agente 0) + QuestionWriter (Agente 1). */
     @PostMapping("/validar/necessidade-informacoes")
     public ResponseEntity<NecessidadeInformacoesResponseDTO> validarNecessidadeInformacoes(
             @RequestBody NecessidadeInformacoesRequestDTO request
@@ -53,7 +46,6 @@ public class RespostaController {
         return ResponseEntity.ok(necessidadeInformacoesService.validar(request, cliente));
     }
 
-    /** Answer validator (Agente Y), continuing/closing the clarification loop for a Pedido. */
     @PostMapping("/validar/resposta-necessidade")
     public ResponseEntity<RespostaNecessidadeResponseDTO> validarRespostaNecessidade(
             @RequestBody RespostaNecessidadeRequestDTO request
@@ -62,7 +54,6 @@ public class RespostaController {
         return ResponseEntity.ok(respostaNecessidadeService.validar(request, cliente));
     }
 
-    /** ElementSelector (Agente X) + ScreenContextDefiner (Agente Z) + TTS. */
     @PostMapping("/achar-resposta")
     public ResponseEntity<AcharRespostaResponseDTO> acharResposta(
             @RequestBody AcharRespostaRequestDTO request

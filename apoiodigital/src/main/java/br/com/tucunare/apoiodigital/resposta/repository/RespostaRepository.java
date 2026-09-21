@@ -20,9 +20,5 @@ public interface RespostaRepository extends JpaRepository<Resposta, UUID> {
 
     Optional<Resposta> findFirstByPedidoIdOrderByTimestampDesc(UUID pedidoId);
 
-    /**
-     * Scoped to the authenticated tenant via Resposta -> Pedido -> Usuario -> Cliente, so a
-     * caller can never use idResposta to reach another partner's data.
-     */
     Optional<Resposta> findByIdAndPedido_Usuario_Cliente_Id(UUID id, UUID clienteId);
 }

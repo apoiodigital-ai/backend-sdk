@@ -21,14 +21,6 @@ import br.com.tucunare.apoiodigital.usuario.service.UsuarioService;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-/**
- * Backs {@code POST /resposta/achar-resposta}: runs the ElementSelector (Agente X) to pick which
- * captured element to highlight, then the ScreenContextDefiner (Agente Z) to write the
- * user-facing instruction and (via {@link TtsService}) synthesize it to speech. Persists the
- * Pedido/Resposta/Componente audit trail for this step — Resposta.raciocinio is exactly the
- * ElementSelector's own explanation for its choice, which is what makes this step traceable
- * rather than an opaque model call.
- */
 @Service
 public class AcharRespostaService {
 

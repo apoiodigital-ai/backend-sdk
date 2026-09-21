@@ -19,13 +19,6 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-/**
- * Computes and checks the assinatura ("signature") that lets the system reuse a cached
- * instruction instead of calling the model again every time the same screen is captured. The
- * previous {@code comparar} implementation never actually looked at either of its string
- * arguments and always returned true once a Resposta id was found — this replaces that dead
- * logic with a real hash comparison against {@link Componente#getAssinatura()}.
- */
 @Service
 public class ComponenteService {
 
@@ -40,14 +33,6 @@ public class ComponenteService {
         this.respostaRepository = respostaRepository;
     }
 
-    /**
-     * Hashes the element hierarchy (viewId + className + text of every captured element,
-     * sorted for determinism) into a single hex digest. Two calls with the same set of
-     * elements — regardless of the order the SDK happened to enumerate them in — always
-     * produce the same assinatura. Coordinates and sizes are deliberately left out of the
-     * hash: they vary per device model, and the assinatura must identify the SCREEN, not the
-     * screen-on-one-particular-phone.
-     */
     public String gerarAssinatura(List<CapturedElementDTO> elementos) {
         String canonical = elementos.stream()
                 .sorted(Comparator.comparing(
@@ -65,11 +50,6 @@ public class ComponenteService {
         return componenteRepository.save(componente);
     }
 
-    /**
-     * @return true when {@code elementosAtuais} hashes to the same assinatura stored for the
-     * last Componente saved against {@code idResposta} — i.e. the screen hasn't meaningfully
-     * changed and the cached instruction on that Resposta can still be trusted.
-     */
     public boolean comparar(UUID idResposta, List<CapturedElementDTO> elementosAtuais, Cliente cliente) {
         Resposta resposta = respostaRepository.findByIdAndPedido_Usuario_Cliente_Id(idResposta, cliente.getId())
                 .orElseThrow(RespostaNaoEncontradaException::new);
@@ -95,7 +75,6 @@ public class ComponenteService {
             }
             return hex.toString();
         } catch (NoSuchAlgorithmException e) {
-            // SHA-256 is guaranteed to be available on every standard JVM; this is unreachable.
             throw new IllegalStateException(e);
         }
     }

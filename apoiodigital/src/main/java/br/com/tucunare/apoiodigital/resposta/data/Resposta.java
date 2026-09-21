@@ -12,13 +12,6 @@ import org.hibernate.type.SqlTypes;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-/**
- * The final instruction produced for a Pedido. {@link #raciocinio} is the internal
- * reasoning/audit trail behind that instruction (the ElementSelector agent's own explanation of
- * why it picked a given element) — it was entirely missing before this refactor even though it
- * is what backs the product's "auditoria e rastreabilidade total" (full audit trail) claim.
- * {@link #mensagem} remains the user-facing text, unchanged in meaning from before.
- */
 @Entity
 @Data
 @Table(name = "resposta")

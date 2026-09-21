@@ -10,16 +10,6 @@ import org.hibernate.type.SqlTypes;
 
 import java.util.UUID;
 
-/**
- * A cache-key signature for the UI screen a Resposta was computed against. {@code assinatura}
- * is a hash of the element hierarchy (class/text/viewID makeup — see
- * {@code ComponenteService#gerarAssinatura}), not the raw screen content itself: comparing a
- * freshly-hashed screen against the stored assinatura lets the SDK tell whether a cached
- * instruction is still valid without spending a fresh LLM call every time the partner app ships
- * a UI update that doesn't actually change this particular screen. (Previously this entity
- * stored a raw JSON blob in a field called {@code conteudo} and had no hash at all — dead
- * weight that never served that cache-key purpose.)
- */
 @Entity
 @Table(name = "componente")
 @Data

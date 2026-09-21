@@ -13,10 +13,6 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 
-/**
- * Replaces Spring Security's default 401 page with the same clean JSON error shape the rest of
- * the API uses, for requests that are missing a valid x-api-key.
- */
 @Component
 public class ApiKeyAuthenticationEntryPoint implements AuthenticationEntryPoint {
 

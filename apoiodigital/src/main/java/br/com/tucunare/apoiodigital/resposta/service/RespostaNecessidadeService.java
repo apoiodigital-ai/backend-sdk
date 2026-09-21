@@ -17,14 +17,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-/**
- * Backs {@code POST /resposta/validar/resposta-necessidade}. Reloads the pendency the Gatekeeper
- * raised (persisted on Pedido by {@link NecessidadeInformacoesService}) and asks the answer
- * validator agent (Agente Y, {@link UserAnswerValidatorService}) whether the user's free-text
- * answer resolves it. If not, the agent's own follow-up question becomes the new pending
- * question and the loop continues; if so, the Pedido is marked ready and the SDK is expected to
- * proceed to {@code POST /resposta/achar-resposta} with the resolved prompt.
- */
 @Service
 public class RespostaNecessidadeService {
 
@@ -49,8 +41,6 @@ public class RespostaNecessidadeService {
                 .orElseThrow(PedidoDoesNotExistException::new);
 
         if (pedido.getStatus() != PedidoStatus.AGUARDANDO_INFORMACAO) {
-            // Nothing pending on this Pedido (already resolved, or never needed clarification) —
-            // idempotently report "no interruption" rather than erroring.
             return new RespostaNecessidadeResponseDTO(false, null, pedido.getId());
         }
 

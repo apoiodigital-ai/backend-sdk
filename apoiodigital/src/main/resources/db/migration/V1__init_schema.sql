@@ -1,11 +1,3 @@
--- Baseline schema for the multi-tenant SDK model. There is no production data behind this
--- project yet, so this migration is written as a clean baseline rather than an ALTER-based
--- migration off the old (pre-refactor) schema — the old Usuario.telefone/senha columns, the
--- AppSuportado/Requisicao/Atalho/RefreshTokens tables from the abandoned standalone-app model,
--- and the flawed Componente.conteudo column simply do not appear here. This file replaces the
--- ad hoc SQL previously kept in databaseScript.sql at the repo root (left untouched — it lives
--- outside backend/apoiodigital) as the source of truth for the schema.
-
 CREATE TABLE cliente (
     id VARCHAR(36) NOT NULL,
     nome VARCHAR(150) NOT NULL,
