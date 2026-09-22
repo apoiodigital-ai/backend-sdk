@@ -2,11 +2,13 @@ package br.com.tucunare.apoiodigital.handler;
 
 import br.com.tucunare.apoiodigital.cliente.exception.ClienteNaoAutenticadoException;
 import br.com.tucunare.apoiodigital.componente.exception.ComponenteNaoEncontradoException;
+import br.com.tucunare.apoiodigital.limite.exception.LimiteRequisicoesExcedidoException;
 import br.com.tucunare.apoiodigital.pedido.exception.PedidoDoesNotExistException;
 import br.com.tucunare.apoiodigital.resposta.exception.RespostaNaoEncontradaException;
 import br.com.tucunare.apoiodigital.usuario.exception.UsuarioDoesNotExistException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -41,6 +43,13 @@ public class RestHandlerExceptions {
     @ExceptionHandler(ClienteNaoAutenticadoException.class)
     public ResponseEntity<ExceptionDTO> clienteNaoAutenticadoHandler(ClienteNaoAutenticadoException ex) {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ExceptionDTO(HttpStatus.UNAUTHORIZED.value(), "Unauthorized", ex.getMessage()));
+    }
+
+    @ExceptionHandler(LimiteRequisicoesExcedidoException.class)
+    public ResponseEntity<ExceptionDTO> limiteRequisicoesExcedidoHandler(LimiteRequisicoesExcedidoException ex) {
+        return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
+                .header(HttpHeaders.RETRY_AFTER, String.valueOf(ex.getSegundosParaLiberar()))
+                .body(new ExceptionDTO(HttpStatus.TOO_MANY_REQUESTS.value(), "TooManyRequests", ex.getMessage()));
     }
 
     @ExceptionHandler(AccessDeniedException.class)

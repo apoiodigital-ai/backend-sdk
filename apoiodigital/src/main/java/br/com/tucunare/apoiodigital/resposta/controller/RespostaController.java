@@ -1,6 +1,7 @@
 package br.com.tucunare.apoiodigital.resposta.controller;
 
 import br.com.tucunare.apoiodigital.cliente.data.Cliente;
+import br.com.tucunare.apoiodigital.limite.LimiteRequisicoesService;
 import br.com.tucunare.apoiodigital.resposta.data.*;
 import br.com.tucunare.apoiodigital.resposta.service.AcharRespostaService;
 import br.com.tucunare.apoiodigital.resposta.service.NecessidadeInformacoesService;
@@ -23,19 +24,22 @@ public class RespostaController {
     private final RespostaNecessidadeService respostaNecessidadeService;
     private final AcharRespostaService acharRespostaService;
     private final TenantContext tenantContext;
+    private final LimiteRequisicoesService limiteRequisicoesService;
 
     public RespostaController(
             RespostaService respostaService,
             NecessidadeInformacoesService necessidadeInformacoesService,
             RespostaNecessidadeService respostaNecessidadeService,
             AcharRespostaService acharRespostaService,
-            TenantContext tenantContext
+            TenantContext tenantContext,
+            LimiteRequisicoesService limiteRequisicoesService
     ) {
         this.respostaService = respostaService;
         this.necessidadeInformacoesService = necessidadeInformacoesService;
         this.respostaNecessidadeService = respostaNecessidadeService;
         this.acharRespostaService = acharRespostaService;
         this.tenantContext = tenantContext;
+        this.limiteRequisicoesService = limiteRequisicoesService;
     }
 
     @PostMapping("/validar/necessidade-informacoes")
@@ -43,6 +47,7 @@ public class RespostaController {
             @RequestBody NecessidadeInformacoesRequestDTO request
     ) {
         Cliente cliente = tenantContext.getClienteAtual();
+        limiteRequisicoesService.verificarUsuario(cliente, request.userId());
         return ResponseEntity.ok(necessidadeInformacoesService.validar(request, cliente));
     }
 
@@ -51,6 +56,7 @@ public class RespostaController {
             @RequestBody RespostaNecessidadeRequestDTO request
     ) {
         Cliente cliente = tenantContext.getClienteAtual();
+        limiteRequisicoesService.verificarUsuario(cliente, request.userId());
         return ResponseEntity.ok(respostaNecessidadeService.validar(request, cliente));
     }
 
@@ -59,6 +65,7 @@ public class RespostaController {
             @RequestBody AcharRespostaRequestDTO request
     ) {
         Cliente cliente = tenantContext.getClienteAtual();
+        limiteRequisicoesService.verificarUsuario(cliente, request.userId());
         return ResponseEntity.ok(acharRespostaService.acharResposta(request, cliente));
     }
 
