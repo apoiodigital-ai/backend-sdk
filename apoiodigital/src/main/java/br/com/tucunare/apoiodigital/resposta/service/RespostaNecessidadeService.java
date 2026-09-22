@@ -53,6 +53,8 @@ public class RespostaNecessidadeService {
                 )
         );
 
+        pedido.registrarEsclarecimento(pedido.getPerguntaPendente(), request.resposta());
+
         if (validador.satisfaz()) {
             pedido.marcarPronto();
             pedidoRepository.save(pedido);

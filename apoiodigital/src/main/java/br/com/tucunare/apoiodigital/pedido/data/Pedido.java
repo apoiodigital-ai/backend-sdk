@@ -11,6 +11,7 @@ import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 import java.util.UUID;
 
 @Entity
@@ -67,5 +68,11 @@ public class Pedido {
 
     public void marcarPronto() {
         this.status = PedidoStatus.PRONTO;
+    }
+
+    public void registrarEsclarecimento(String pergunta, String resposta) {
+        this.prompt = Objects.toString(this.prompt, "")
+                + "\nPergunta do assistente: " + Objects.toString(pergunta, "")
+                + "\nResposta do usuário: " + Objects.toString(resposta, "");
     }
 }

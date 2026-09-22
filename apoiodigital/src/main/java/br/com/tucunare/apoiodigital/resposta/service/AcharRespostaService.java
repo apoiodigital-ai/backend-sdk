@@ -4,6 +4,7 @@ import br.com.tucunare.apoiodigital.agent.CapturedElementDTO;
 import br.com.tucunare.apoiodigital.cliente.data.Cliente;
 import br.com.tucunare.apoiodigital.componente.service.ComponenteService;
 import br.com.tucunare.apoiodigital.pedido.data.Pedido;
+import br.com.tucunare.apoiodigital.pedido.exception.PedidoDoesNotExistException;
 import br.com.tucunare.apoiodigital.pedido.repository.PedidoRepository;
 import br.com.tucunare.apoiodigital.resposta.data.AcharRespostaRequestDTO;
 import br.com.tucunare.apoiodigital.resposta.data.AcharRespostaResponseDTO;
@@ -53,10 +54,11 @@ public class AcharRespostaService {
     public AcharRespostaResponseDTO acharResposta(AcharRespostaRequestDTO request, Cliente cliente) {
         Usuario usuario = usuarioService.resolverOuCriar(request.userId(), cliente);
 
-        Pedido pedido = pedidoRepository.save(new Pedido(usuario, request.prompt()));
+        Pedido pedido = resolverPedido(request, usuario);
+        String promptComEsclarecimentos = pedido.getPrompt();
 
         ElementSelectorResponseDTO selecao = elementSelectorService.executeTask(
-                new ElementSelectorRequestDTO(request.prompt(), request.elementos())
+                new ElementSelectorRequestDTO(promptComEsclarecimentos, request.elementos())
         );
 
         CapturedElementDTO elementoEscolhido = request.elementos().stream()
@@ -67,7 +69,7 @@ public class AcharRespostaService {
                 ));
 
         ScreenContextDefinerResponseDTO textoGuia = screenContextDefinerService.executeTask(
-                new ScreenContextDefinerRequestDTO(request.prompt(), selecao.raciocinio(), elementoEscolhido)
+                new ScreenContextDefinerRequestDTO(promptComEsclarecimentos, selecao.raciocinio(), elementoEscolhido)
         );
 
         Resposta resposta = respostaRepository.save(
@@ -86,6 +88,14 @@ public class AcharRespostaService {
                 mensagemVozUrl,
                 selecao.precisao()
         );
+    }
+
+    private Pedido resolverPedido(AcharRespostaRequestDTO request, Usuario usuario) {
+        if (request.idPedido() == null) {
+            return pedidoRepository.save(new Pedido(usuario, request.prompt()));
+        }
+        return pedidoRepository.findByIdAndUsuarioId(request.idPedido(), usuario.getId())
+                .orElseThrow(PedidoDoesNotExistException::new);
     }
 
     private String buildAudioUrl(String filename) {
