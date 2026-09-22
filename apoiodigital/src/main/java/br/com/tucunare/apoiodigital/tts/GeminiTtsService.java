@@ -25,6 +25,7 @@ public class GeminiTtsService implements TtsService {
 
     private static final Logger log = LoggerFactory.getLogger(GeminiTtsService.class);
     private static final Pattern SAMPLE_RATE_PATTERN = Pattern.compile("rate=(\\d+)");
+    static final String API_KEY_HEADER = "x-goog-api-key";
 
     private final boolean enabled;
     private final String apiKey;
@@ -74,7 +75,8 @@ public class GeminiTtsService implements TtsService {
             );
 
             String responseJson = restClient.post()
-                    .uri("/v1beta/models/{model}:generateContent?key={apiKey}", model, apiKey)
+                    .uri("/v1beta/models/{model}:generateContent", model)
+                    .header(API_KEY_HEADER, apiKey)
                     .contentType(org.springframework.http.MediaType.APPLICATION_JSON)
                     .body(requestBody)
                     .retrieve()
