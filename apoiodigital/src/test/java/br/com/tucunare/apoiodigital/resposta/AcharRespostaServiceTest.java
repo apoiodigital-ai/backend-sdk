@@ -7,6 +7,7 @@ import br.com.tucunare.apoiodigital.pedido.data.Pedido;
 import br.com.tucunare.apoiodigital.pedido.exception.PedidoDoesNotExistException;
 import br.com.tucunare.apoiodigital.pedido.repository.PedidoRepository;
 import br.com.tucunare.apoiodigital.resposta.data.AcharRespostaRequestDTO;
+import br.com.tucunare.apoiodigital.resposta.data.AcharRespostaResponseDTO;
 import br.com.tucunare.apoiodigital.resposta.data.Resposta;
 import br.com.tucunare.apoiodigital.resposta.repository.RespostaRepository;
 import br.com.tucunare.apoiodigital.resposta.service.AcharRespostaService;
@@ -126,6 +127,25 @@ class AcharRespostaServiceTest {
         ArgumentCaptor<Object> seletor = ArgumentCaptor.forClass(Object.class);
         verify(elementSelectorService).executeTask(seletor.capture());
         assertEquals("Quero pagar uma conta", ((ElementSelectorRequestDTO) seletor.getValue()).prompt());
+    }
+
+    @Test
+    @DisplayName("returns the id of the stored Resposta so the caller can use /componentes/comparar")
+    void devolveIdResposta() {
+        UUID idGerado = UUID.randomUUID();
+        when(respostaRepository.save(any(Resposta.class))).thenAnswer(invocation -> {
+            Resposta salva = invocation.getArgument(0);
+            salva.setId(idGerado);
+            return salva;
+        });
+
+        AcharRespostaResponseDTO resposta = service.acharResposta(
+                new AcharRespostaRequestDTO("usr_anon_teste", "Quero pagar uma conta", elementos, null),
+                cliente
+        );
+
+        assertEquals(idGerado, resposta.idResposta());
+        assertEquals("btn-pagar-boleto", resposta.viewID());
     }
 
     @Test

@@ -86,7 +86,8 @@ public class AcharRespostaService {
                 selecao.viewId(),
                 textoGuia.mensagem_escrita(),
                 mensagemVozUrl,
-                selecao.precisao()
+                selecao.precisao(),
+                resposta.getId()
         );
     }
 
